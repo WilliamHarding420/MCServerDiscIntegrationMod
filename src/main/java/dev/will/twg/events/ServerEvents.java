@@ -3,6 +3,7 @@ package dev.will.twg.events;
 import dev.will.twg.Config;
 import dev.will.twg.DiscordWebHook;
 import dev.will.twg.WebHookHelper;
+import dev.will.twg.commands.DiscordWebHookRoot;
 import dev.will.twg.discord.DiscordBot;
 import dev.will.twg.discord.DiscordMessageReceived;
 import net.neoforged.bus.api.SubscribeEvent;

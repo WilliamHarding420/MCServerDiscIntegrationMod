@@ -22,7 +22,7 @@ public class DiscordWebHook {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private IEventBus modEventBus;
+    private final IEventBus modEventBus;
 
     public static MinecraftServer Server;
 
