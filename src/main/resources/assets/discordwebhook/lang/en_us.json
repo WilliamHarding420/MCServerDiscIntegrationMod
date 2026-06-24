@@ -1,0 +1,10 @@
+{
+  "itemGroup.DiscordWebHook": "Example Mod Tab",
+
+  "DiscordWebHook.configuration.title": "DiscordWebHook Configs",
+  "DiscordWebHook.configuration.section.DiscordWebHook.common.toml": "DiscordWebHook Configs",
+  "DiscordWebHook.configuration.section.DiscordWebHook.common.toml.title": "DiscordWebHook Configs",
+  "DiscordWebHook.configuration.discord_bot_token": "Discord Bot Token",
+  "DiscordWebHook.configuration.discord_webhook": "Discord Web Hook Link",
+  "DiscordWebHook.configuration.discord_channel_ids": "Channel IDs"
+}
