@@ -1,5 +1,7 @@
 package dev.will.twg;
 
+import dev.will.twg.discord.DiscordBot;
+import dev.will.twg.discord.DiscordMessageReceived;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -55,10 +57,61 @@ public class DiscordWebHook {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
 
+        WebHookHelper.DiscordWebHookURL = Config.DISCORD_WEB_HOOK.get();
+        DiscordMessageReceived.ChannelIDs = Config.DISCORD_BOT_CHANNEL_IDS.get();
+        LOGGER.debug("Read discord webhook and channel IDs from config.");
 
         Server = event.getServer();
 
+        NeoForge.EVENT_BUS.addListener(this::onPlayerJoin);
+        NeoForge.EVENT_BUS.addListener(this::onPlayerLeave);
+        NeoForge.EVENT_BUS.addListener(this::onPlayerChat);
+        LOGGER.debug("Added event listeners.");
 
+        DiscordBot.CreateBot();
+
+    }
+
+    @SubscribeEvent
+    public void onServerStopping(ServerStoppingEvent event) {
+        DiscordBot.DiscordBot.shutdownNow();
+    }
+    
+    public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+
+        LOGGER.debug("Executing player join event.");
+
+        Player player = event.getEntity();
+
+        String webHookMessage = String.format("%s joined.", player.getDisplayName().getString());
+
+        DiscordBot.UpdateBotStatusPlayerCount(Server.getPlayerCount());
+        WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+
+    }
+
+    public void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+
+        LOGGER.debug("Executing player left event.");
+
+        Player player = event.getEntity();
+
+        String webHookMessage = String.format("%s left.", player.getDisplayName().getString());
+
+        DiscordBot.UpdateBotStatusPlayerCount(Server.getPlayerCount() - 1);
+        WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+
+    }
+
+    public void onPlayerChat(ServerChatEvent event) {
+
+        LOGGER.debug("Executing player chat event.");
+
+        ServerPlayer player = event.getPlayer();
+
+        String webHookMessage = String.format("%s: %s", player.getDisplayName().getString(), event.getMessage().getString());
+
+        WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
 
     }
 
