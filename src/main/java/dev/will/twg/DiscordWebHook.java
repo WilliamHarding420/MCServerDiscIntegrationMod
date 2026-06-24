@@ -76,7 +76,7 @@ public class DiscordWebHook {
     public void onServerStopping(ServerStoppingEvent event) {
         DiscordBot.DiscordBot.shutdownNow();
     }
-    
+
     public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
 
         LOGGER.debug("Executing player join event.");
