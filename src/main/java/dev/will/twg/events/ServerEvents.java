@@ -24,8 +24,17 @@ public class ServerEvents {
 
         DiscordBot.CreateBot();
 
+        registerCommands();
+
         if (Config.SEND_SERVER_STATUS.get())
             WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, "Server has started.");
+
+
+    }
+
+    private void registerCommands() {
+
+        new DiscordWebHookRoot().register();
 
     }
 
