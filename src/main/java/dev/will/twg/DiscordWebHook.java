@@ -70,11 +70,17 @@ public class DiscordWebHook {
 
         DiscordBot.CreateBot();
 
+        if (Config.SEND_SERVER_STATUS.get())
+            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, "Server has started.");
+
     }
 
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
         DiscordBot.DiscordBot.shutdownNow();
+
+        if (Config.SEND_SERVER_STATUS.get())
+            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, "Server shutting down.");
     }
 
     public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -86,7 +92,9 @@ public class DiscordWebHook {
         String webHookMessage = String.format("%s joined.", player.getDisplayName().getString());
 
         DiscordBot.UpdateBotStatusPlayerCount(Server.getPlayerCount());
-        WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+
+        if (Config.SEND_PLAYER_CONNECTIONS.get())
+            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
 
     }
 
@@ -99,7 +107,9 @@ public class DiscordWebHook {
         String webHookMessage = String.format("%s left.", player.getDisplayName().getString());
 
         DiscordBot.UpdateBotStatusPlayerCount(Server.getPlayerCount() - 1);
-        WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+
+        if (Config.SEND_PLAYER_CONNECTIONS.get())
+            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
 
     }
 
@@ -111,7 +121,8 @@ public class DiscordWebHook {
 
         String webHookMessage = String.format("%s: %s", player.getDisplayName().getString(), event.getMessage().getString());
 
-        WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+        if(Config.SEND_MINECRAFT_MESSAGES.get())
+            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
 
     }
 

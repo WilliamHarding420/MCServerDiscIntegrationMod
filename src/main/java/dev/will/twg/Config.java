@@ -33,5 +33,25 @@ public class Config {
             .translation("DiscordWebHook.configuration.discord_channel_ids")
             .define("discord_channels", new ArrayList<String>());
 
+    public static final ModConfigSpec.ConfigValue<Boolean> SEND_SERVER_STATUS = BUILDER
+            .comment("Whether or not to send server starting/stopping messages")
+            .translation("DiscordWebHook.configuration.send_server_status")
+            .define("send_server_status", true);
+
+    public static final ModConfigSpec.ConfigValue<Boolean> SEND_PLAYER_CONNECTIONS = BUILDER
+            .comment("Whether or not to send player join/leave messages")
+            .translation("DiscordWebHook.configuration.send_player_connections")
+            .define("send_player_connections", true);
+
+    public static final ModConfigSpec.ConfigValue<Boolean> SEND_MINECRAFT_MESSAGES = BUILDER
+            .comment("Whether or not to send Minecraft chat messages to webhook")
+            .translation("DiscordWebHook.configuration.send_minecraft_chat")
+            .define("send_minecraft_chat", true);
+
+    public static final ModConfigSpec.ConfigValue<Boolean> SEND_DISCORD_MESSAGES = BUILDER
+            .comment("Whether or not to send Discord messages in the Minecraft chat")
+            .translation("DiscordWebHook.configuration.send_discord_chat")
+            .define("send_discord_chat", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 }
