@@ -67,7 +67,7 @@ public class DiscordWebHookRoot {
             return 0;
         }
 
-        Object value = parseArgumentFromString(context.getArgument("value", String.class), config.getSpec().getClazz());
+        Object value = CommandUtils.parseArgumentFromString(context.getArgument("value", String.class), config.getSpec().getClazz());
 
         if (value == null) {
             context.getSource().sendSystemMessage(Component.literal("Invalid config value."));
@@ -94,19 +94,6 @@ public class DiscordWebHookRoot {
             case "send_discord_chat" -> Config.SEND_DISCORD_MESSAGES;
             default -> null;
         };
-
-    }
-
-    // parses value to required type
-    public static Object parseArgumentFromString(String value, Object to) {
-
-        if (to == String.class)
-            return value;
-
-        if (to == Boolean.class)
-            return Boolean.parseBoolean(value);
-
-        return null;
 
     }
 
