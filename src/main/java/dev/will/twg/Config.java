@@ -1,6 +1,9 @@
 package dev.will.twg;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -56,4 +59,42 @@ public class Config {
             .define("send_death_messages", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
+
+    // util methods for commands, etc.
+    public static Dictionary<String, ModConfigSpec.ConfigValue<?>> configOptionDictionary = null;
+    public static List<String> configPaths = null;
+    public static <T> ModConfigSpec.ConfigValue<?> configNameToVariable(String name) {
+
+        if (configOptionDictionary == null || configPaths == null)
+            cacheConfigPaths();
+
+        return configOptionDictionary.get(name);
+
+    }
+
+    public static void cacheConfigPaths() {
+        configOptionDictionary = new Hashtable<>();
+        configPaths = new ArrayList<>();
+
+        Class<Config> configClass = Config.class;
+        Field[] configFields = configClass.getFields();
+
+        for (Field configField : configFields) {
+            ModConfigSpec.ConfigValue<?> field;
+
+            try {
+                field = (ModConfigSpec.ConfigValue<?>) configField.get(null);
+                if (!(field instanceof ModConfigSpec.ConfigValue<?>))
+                    continue;
+            } catch (Exception e) {
+                DiscordWebHook.LOGGER.debug("Exception occurred while caching config paths. {}", e.getMessage());
+                continue;
+            }
+
+            configOptionDictionary.put(field.getPath().getFirst(), field);
+            configPaths.add(field.getPath().getFirst());
+
+        }
+    }
+
 }
