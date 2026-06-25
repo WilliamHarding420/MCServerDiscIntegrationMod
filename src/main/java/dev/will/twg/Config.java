@@ -45,5 +45,15 @@ public class Config {
             .translation("DiscordWebHook.configuration.send_discord_chat")
             .define("send_discord_chat", true);
 
+    public static final ModConfigSpec.ConfigValue<Boolean> SEND_ADVANCEMENT_MESSAGES = BUILDER
+            .comment("Whether or not to send advancement messages")
+            .translation("DiscordWebHook.configuration.send_advancement_messages")
+            .define("send_advancement_messages", true);
+
+    public static final ModConfigSpec.ConfigValue<Boolean> SEND_DEATH_MESSAGES = BUILDER
+            .comment("Whether or not to send death messages.")
+            .translation("DiscordWebHook.configuration.send_death_messages")
+            .define("send_death_messages", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 }
