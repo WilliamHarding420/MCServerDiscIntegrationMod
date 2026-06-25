@@ -11,6 +11,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.lang.reflect.Field;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 public class DiscordWebHookRoot {
 
     public static LiteralCommandNode<CommandSourceStack> DiscordWebHookRootCommand = null;
@@ -83,17 +87,33 @@ public class DiscordWebHookRoot {
 
     }
 
-    // only contains config options currently configurable in game
+    static Dictionary<String, ModConfigSpec.ConfigValue<?>> configOptionDictionary = null;
+
     public static <T> ModConfigSpec.ConfigValue<?> configNameToVariable(String name) {
 
-        return switch (name) {
-            case "discord_web_hook" -> Config.DISCORD_WEB_HOOK;
-            case "send_server_status" -> Config.SEND_SERVER_STATUS;
-            case "send_player_connections" -> Config.SEND_PLAYER_CONNECTIONS;
-            case "send_minecraft_chat" -> Config.SEND_MINECRAFT_MESSAGES;
-            case "send_discord_chat" -> Config.SEND_DISCORD_MESSAGES;
-            default -> null;
-        };
+        if (configOptionDictionary == null) {
+            configOptionDictionary = new Hashtable<>();
+
+            Class<Config> configClass = Config.class;
+            Field[] configFields = configClass.getFields();
+
+            for (Field configField : configFields) {
+                ModConfigSpec.ConfigValue<?> field;
+
+                try {
+                    field = (ModConfigSpec.ConfigValue<?>) configField.get(null);
+                    if (!(field instanceof ModConfigSpec.ConfigValue<?>))
+                        continue;
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+
+                configOptionDictionary.put(field.getPath().getFirst(), field);
+
+            }
+        }
+
+        return configOptionDictionary.get(name);
 
     }
 
