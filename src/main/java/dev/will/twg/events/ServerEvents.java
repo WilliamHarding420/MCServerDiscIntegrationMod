@@ -21,6 +21,7 @@ public class ServerEvents {
         DiscordWebHook.LOGGER.debug("Read discord webhook and channel IDs from config.");
 
         DiscordWebHook.Server = event.getServer();
+        Config.cacheConfigPaths();
 
         DiscordBot.CreateBot();
 
