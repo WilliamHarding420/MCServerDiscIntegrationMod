@@ -11,8 +11,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class WebHookHelper {
 
-    public static String DiscordWebHookURL = "";
-
     public static CompletableFuture<Void> SendWebHook(String URL, String Message) {
         return CompletableFuture.supplyAsync(() -> {
             SendWebHookSynchronous(URL, Message);

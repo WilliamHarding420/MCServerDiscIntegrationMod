@@ -15,8 +15,6 @@ import java.util.List;
 
 public class DiscordMessageReceived extends ListenerAdapter {
 
-    public static List<String> ChannelIDs = new ArrayList<>();
-
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
@@ -24,7 +22,7 @@ public class DiscordMessageReceived extends ListenerAdapter {
 
         if (event.getAuthor().isBot()
                 || event.isWebhookMessage()
-                || !ChannelIDs.contains(event.getChannel().getId())
+                || !Config.DISCORD_BOT_CHANNEL_IDS.get().contains(event.getChannel().getId())
                 || !Config.SEND_DISCORD_MESSAGES.get())
             return;
 

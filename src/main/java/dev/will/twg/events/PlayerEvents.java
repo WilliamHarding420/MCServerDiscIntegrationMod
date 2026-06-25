@@ -27,7 +27,7 @@ public class PlayerEvents {
         DiscordBot.UpdateBotStatusPlayerCount(DiscordWebHook.Server.getPlayerCount());
 
         if (Config.SEND_PLAYER_CONNECTIONS.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), webHookMessage);
 
     }
 
@@ -43,7 +43,7 @@ public class PlayerEvents {
         DiscordBot.UpdateBotStatusPlayerCount(DiscordWebHook.Server.getPlayerCount() - 1);
 
         if (Config.SEND_PLAYER_CONNECTIONS.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), webHookMessage);
 
     }
 
@@ -57,7 +57,7 @@ public class PlayerEvents {
         String webHookMessage = String.format("%s: %s", player.getDisplayName().getString(), event.getMessage().getString());
 
         if(Config.SEND_MINECRAFT_MESSAGES.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), webHookMessage);
 
     }
 
@@ -73,7 +73,7 @@ public class PlayerEvents {
                 event.getAdvancement().value().name().get().getString());
 
         if (Config.SEND_ADVANCEMENT_MESSAGES.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, webHookMessage);
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), webHookMessage);
 
     }
 
@@ -88,7 +88,7 @@ public class PlayerEvents {
         Component deathMessage = event.getSource().getLocalizedDeathMessage(event.getEntity());
 
         if (Config.SEND_DEATH_MESSAGES.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, String.format("%s.", deathMessage.getString()));
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), String.format("%s.", deathMessage.getString()));
 
     }
 

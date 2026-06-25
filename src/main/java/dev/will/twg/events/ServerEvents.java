@@ -16,8 +16,6 @@ public class ServerEvents {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
 
-        WebHookHelper.DiscordWebHookURL = Config.DISCORD_WEB_HOOK.get();
-        DiscordMessageReceived.ChannelIDs = Config.DISCORD_BOT_CHANNEL_IDS.get();
         DiscordWebHook.LOGGER.debug("Read discord webhook and channel IDs from config.");
 
         DiscordWebHook.Server = event.getServer();
@@ -28,7 +26,7 @@ public class ServerEvents {
         registerCommands();
 
         if (Config.SEND_SERVER_STATUS.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, "Server has started.");
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), "Server has started.");
 
 
     }
@@ -44,7 +42,7 @@ public class ServerEvents {
         DiscordBot.DiscordBot.shutdownNow();
 
         if (Config.SEND_SERVER_STATUS.get())
-            WebHookHelper.SendWebHook(WebHookHelper.DiscordWebHookURL, "Server shutting down.");
+            WebHookHelper.SendWebHook(Config.DISCORD_WEB_HOOK.get(), "Server shutting down.");
     }
 
 }
