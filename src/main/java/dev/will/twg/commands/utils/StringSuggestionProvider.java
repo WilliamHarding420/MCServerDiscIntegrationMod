@@ -1,4 +1,4 @@
-package dev.will.twg.commands;
+package dev.will.twg.commands.utils;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
