@@ -1,6 +1,7 @@
 package dev.will.twg.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.will.twg.Config;
@@ -11,36 +12,29 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-import java.lang.reflect.Field;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
 public class DiscordWebHookRoot {
 
     public static LiteralCommandNode<CommandSourceStack> DiscordWebHookRootCommand = null;
 
     public void register() {
 
-        DiscordWebHookRootCommand = DiscordWebHook.Server.getCommands().getDispatcher().register(
-                Commands.literal("discordwebhook").requires(sourceStack -> sourceStack.hasPermission(3))
-                        .then(
-                                Commands.literal("config")
-                                        .then(
-                                                Commands.argument("config_name", StringArgumentType.word())
+        LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("discordwebhook").requires(sourceStack -> sourceStack.hasPermission(3))
+                .then(
+                        Commands.literal("config")
+                                .then(
+                                        Commands.argument("config_name", StringArgumentType.word())
+                                                .suggests(new StringSuggestionProvider(Config.configPaths))
+                                                .then(Commands.literal("get")
+                                                        .executes(this::getConfig))
+                                                .then(Commands.literal("set")
                                                         .then(
-                                                                Commands.literal("get")
-                                                                        .executes(this::getConfig)
-                                                        )
-                                                        .then(
-                                                                Commands.literal("set")
-                                                                        .then(
-                                                                                Commands.argument("value", StringArgumentType.word())
-                                                                                        .executes(this::modifyConfig)
-                                                                        )
-                                                        )
-                                        )
-                        )
-        );
+                                                                Commands.argument("value", StringArgumentType.word())
+                                                                        .executes(this::modifyConfig)
+                                                        ))
+                                )
+                );
+
+        DiscordWebHookRootCommand = DiscordWebHook.Server.getCommands().getDispatcher().register(builder);
 
     }
 
@@ -48,7 +42,7 @@ public class DiscordWebHookRoot {
 
         String config_name = context.getArgument("config_name", String.class);
 
-        ModConfigSpec.ConfigValue<?> config = configNameToVariable(config_name);
+        ModConfigSpec.ConfigValue<?> config = Config.configNameToVariable(config_name);
 
         if (config == null) {
             context.getSource().sendSystemMessage(Component.literal("Must give a valid config name."));
@@ -64,7 +58,7 @@ public class DiscordWebHookRoot {
     private int modifyConfig(CommandContext<CommandSourceStack> context) {
 
         String config_option = context.getArgument("config_name", String.class);
-        ModConfigSpec.ConfigValue<Object> config = (ModConfigSpec.ConfigValue<Object>) configNameToVariable(config_option);
+        ModConfigSpec.ConfigValue<Object> config = (ModConfigSpec.ConfigValue<Object>) Config.configNameToVariable(config_option);
 
         if (config == null) {
             context.getSource().sendSystemMessage(Component.literal("Must give a valid config name."));
@@ -84,36 +78,6 @@ public class DiscordWebHookRoot {
         context.getSource().sendSystemMessage(Component.literal(String.format("Config option \"%s\" set to \"%s\".", config_option, value)));
 
         return 0;
-
-    }
-
-    static Dictionary<String, ModConfigSpec.ConfigValue<?>> configOptionDictionary = null;
-
-    public static <T> ModConfigSpec.ConfigValue<?> configNameToVariable(String name) {
-
-        if (configOptionDictionary == null) {
-            configOptionDictionary = new Hashtable<>();
-
-            Class<Config> configClass = Config.class;
-            Field[] configFields = configClass.getFields();
-
-            for (Field configField : configFields) {
-                ModConfigSpec.ConfigValue<?> field;
-
-                try {
-                    field = (ModConfigSpec.ConfigValue<?>) configField.get(null);
-                    if (!(field instanceof ModConfigSpec.ConfigValue<?>))
-                        continue;
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-
-                configOptionDictionary.put(field.getPath().getFirst(), field);
-
-            }
-        }
-
-        return configOptionDictionary.get(name);
 
     }
 
