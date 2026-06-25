@@ -24,13 +24,11 @@ public class DiscordWebHookRoot {
                                 .then(
                                         Commands.argument("config_name", StringArgumentType.word())
                                                 .suggests(new StringSuggestionProvider(Config.configPaths))
-                                                .then(Commands.literal("get")
-                                                        .executes(this::getConfig))
-                                                .then(Commands.literal("set")
-                                                        .then(
-                                                                Commands.argument("value", StringArgumentType.word())
-                                                                        .executes(this::modifyConfig)
-                                                        ))
+                                                .executes(this::getConfig)
+                                                .then(
+                                                        Commands.argument("value", StringArgumentType.word())
+                                                                .executes(this::modifyConfig)
+                                                )
                                 )
                 );
 
