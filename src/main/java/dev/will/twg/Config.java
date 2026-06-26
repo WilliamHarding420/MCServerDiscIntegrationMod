@@ -6,10 +6,10 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import dev.will.twg.annotations.ListType;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import org.jetbrains.annotations.NotNull;
 
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Neo's config APIs
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -23,6 +23,7 @@ public class Config {
             .translation("DiscordWebHook.configuration.discord_webhook")
             .define("discord_web_hook", "");
 
+    @ListType(String.class)
     public static final ModConfigSpec.ConfigValue<List<String>> DISCORD_BOT_CHANNEL_IDS = BUILDER
             .comment("A list of channel IDs to get the chat messages from.")
             .translation("DiscordWebHook.configuration.discord_channel_ids")
@@ -61,9 +62,9 @@ public class Config {
     static final ModConfigSpec SPEC = BUILDER.build();
 
     // util methods for commands, etc.
-    public static Dictionary<String, ModConfigSpec.ConfigValue<?>> configOptionDictionary = null;
+    public static Dictionary<String, ConfigInfo> configOptionDictionary = null;
     public static List<String> configPaths = null;
-    public static <T> ModConfigSpec.ConfigValue<?> configNameToVariable(String name) {
+    public static <T> ConfigInfo configNameToVariable(String name) {
 
         if (configOptionDictionary == null || configPaths == null)
             cacheConfigPaths();
@@ -91,10 +92,32 @@ public class Config {
                 continue;
             }
 
-            configOptionDictionary.put(field.getPath().getFirst(), field);
+            ConfigInfo cfgInfo = new ConfigInfo(field);
+
+            if (field.get() instanceof List<?>) {
+                ListType listType = configField.getAnnotation(ListType.class);
+
+                if (listType != null)
+                    cfgInfo.listType = listType.value();
+            }
+
+            configOptionDictionary.put(field.getPath().getFirst(), cfgInfo);
             configPaths.add(field.getPath().getFirst());
 
         }
+    }
+
+    public static class ConfigInfo {
+
+        @NotNull
+        public ModConfigSpec.ConfigValue<?> configValue;
+
+        public Class<?> listType;
+
+        public ConfigInfo(@NotNull ModConfigSpec.ConfigValue<?> value) {
+            configValue = value;
+        }
+
     }
 
 }
