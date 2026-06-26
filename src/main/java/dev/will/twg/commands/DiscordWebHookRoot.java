@@ -14,6 +14,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.List;
+
 public class DiscordWebHookRoot {
 
     public static LiteralCommandNode<CommandSourceStack> DiscordWebHookRootCommand = null;
@@ -42,12 +44,14 @@ public class DiscordWebHookRoot {
 
         String config_name = context.getArgument("config_name", String.class);
 
-        ModConfigSpec.ConfigValue<?> config = Config.configNameToVariable(config_name);
+        Config.ConfigInfo configInfo = Config.configNameToVariable(config_name);
 
-        if (config == null) {
+        if (configInfo == null) {
             context.getSource().sendSystemMessage(Component.literal("Must give a valid config name."));
             return 0;
         }
+
+        ModConfigSpec.ConfigValue<?> config = configInfo.configValue;
 
         MutableComponent message = Component.literal(String.format("Value of \"%s\" is \"%s\"", config_name, config.get()));
         context.getSource().sendSystemMessage(message);
@@ -58,21 +62,45 @@ public class DiscordWebHookRoot {
     private int modifyConfig(CommandContext<CommandSourceStack> context) {
 
         String config_option = context.getArgument("config_name", String.class);
-        ModConfigSpec.ConfigValue<Object> config = (ModConfigSpec.ConfigValue<Object>) Config.configNameToVariable(config_option);
+        Config.ConfigInfo configInfo = Config.configNameToVariable(config_option);
 
-        if (config == null) {
+        if (configInfo == null) {
             context.getSource().sendSystemMessage(Component.literal("Must give a valid config name."));
             return 0;
         }
 
-        Object value = CommandUtils.parseArgumentFromString(context.getArgument("value", String.class), config.getSpec().getClazz());
+        ModConfigSpec.ConfigValue<Object> config = (ModConfigSpec.ConfigValue<Object>) configInfo.configValue;
+
+        Class configType;
+        if (config.get() instanceof List<?>) {
+            if (configInfo.listType == null) {
+                context.getSource().sendSystemMessage(Component.literal("This list is not editable."));
+                return 0;
+            }
+            configType = configInfo.listType;
+        } else
+            configType = config.getSpec().getClazz();
+
+        Object value = CommandUtils.parseArgumentFromString(context.getArgument("value", String.class), configType);
 
         if (value == null) {
             context.getSource().sendSystemMessage(Component.literal("Invalid config value."));
             return 0;
         }
 
-        config.set(value);
+        if (config.get() instanceof List<?> configList) {
+
+            if (configList.contains(value))
+                configList.remove(value);
+            else {
+                List<Object> objList = (List<Object>) configList;
+                objList.add(value);
+            }
+
+        } else {
+            config.set(value);
+        }
+
         config.save();
 
         context.getSource().sendSystemMessage(Component.literal(String.format("Config option \"%s\" set to \"%s\".", config_option, value)));
