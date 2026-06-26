@@ -39,7 +39,3 @@ public class CommandUtils {
     }
 
 }
-
-interface ConversionMethod {
-
-}
