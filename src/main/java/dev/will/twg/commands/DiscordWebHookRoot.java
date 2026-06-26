@@ -47,14 +47,13 @@ public class DiscordWebHookRoot {
         Config.ConfigInfo configInfo = Config.configNameToVariable(config_name);
 
         if (configInfo == null) {
-            context.getSource().sendSystemMessage(Component.literal("Must give a valid config name."));
+            CommandUtils.sendCommandFeedback(context, "Must give a valid config name.");
             return 0;
         }
 
         ModConfigSpec.ConfigValue<?> config = configInfo.configValue;
 
-        MutableComponent message = Component.literal(String.format("Value of \"%s\" is \"%s\"", config_name, config.get()));
-        context.getSource().sendSystemMessage(message);
+        CommandUtils.sendCommandFeedback(context, String.format("Value of \"%s\" is \"%s\"", config_name, config.get()));
 
         return 0;
     }
@@ -65,45 +64,54 @@ public class DiscordWebHookRoot {
         Config.ConfigInfo configInfo = Config.configNameToVariable(config_option);
 
         if (configInfo == null) {
-            context.getSource().sendSystemMessage(Component.literal("Must give a valid config name."));
+            CommandUtils.sendCommandFeedback(context, "Must give a valid config name.");
             return 0;
         }
 
         ModConfigSpec.ConfigValue<Object> config = (ModConfigSpec.ConfigValue<Object>) configInfo.configValue;
 
         Class configType;
+        // if the config option is a list, try get the value from ListType attribute for parsing
         if (config.get() instanceof List<?>) {
             if (configInfo.listType == null) {
-                context.getSource().sendSystemMessage(Component.literal("This list is not editable."));
+                CommandUtils.sendCommandFeedback(context, "This list is not editable.");
                 return 0;
             }
             configType = configInfo.listType;
-        } else
+        } else // if not list type, just get the config value's type
             configType = config.getSpec().getClazz();
 
         Object value = CommandUtils.parseArgumentFromString(context.getArgument("value", String.class), configType);
 
         if (value == null) {
-            context.getSource().sendSystemMessage(Component.literal("Invalid config value."));
+            CommandUtils.sendCommandFeedback(context, "Invalid config value.");
             return 0;
         }
 
+        // checking if the config value is a list type
         if (config.get() instanceof List<?> configList) {
 
-            if (configList.contains(value))
+            // removing the entered value if it exists
+            if (configList.contains(value)) {
+
                 configList.remove(value);
-            else {
+                CommandUtils.sendCommandFeedback(context, String.format("Removed element \"%s\" from \"%s\".", value, config.getPath()));
+
+            }
+            else { // adding the entered value if it doesn't exist, must cast to List<Object> as cant add elements to List<?>
+
                 List<Object> objList = (List<Object>) configList;
                 objList.add(value);
+                CommandUtils.sendCommandFeedback(context, String.format("Added element \"%s\" to \"%s\".", value, config.getPath()));
+
             }
 
-        } else {
+        } else { // if not a list config option, just set the value
             config.set(value);
+            CommandUtils.sendCommandFeedback(context, String.format("Config option \"%s\" set to \"%s\".", config_option, value));
         }
 
         config.save();
-
-        context.getSource().sendSystemMessage(Component.literal(String.format("Config option \"%s\" set to \"%s\".", config_option, value)));
 
         return 0;
 
