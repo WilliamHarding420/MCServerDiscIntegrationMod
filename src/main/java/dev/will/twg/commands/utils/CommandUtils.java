@@ -1,6 +1,9 @@
 package dev.will.twg.commands.utils;
 
 import com.google.common.primitives.UnsignedInteger;
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -36,6 +39,10 @@ public class CommandUtils {
 
         return method.apply(value);
 
+    }
+
+    public static void sendCommandFeedback(CommandContext<CommandSourceStack> context, String message) {
+        context.getSource().sendSystemMessage(Component.literal(message));
     }
 
 }
