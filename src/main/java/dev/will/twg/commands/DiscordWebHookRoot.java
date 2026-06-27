@@ -7,6 +7,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.will.twg.Config;
 import dev.will.twg.DiscordWebHook;
 import dev.will.twg.commands.utils.CommandUtils;
+import dev.will.twg.commands.utils.ConfigValueSuggestionProvider;
 import dev.will.twg.commands.utils.StringSuggestionProvider;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -31,6 +32,7 @@ public class DiscordWebHookRoot {
                                                 .executes(this::getConfig)
                                                 .then(
                                                         Commands.argument("value", StringArgumentType.word())
+                                                                .suggests(new ConfigValueSuggestionProvider())
                                                                 .executes(this::modifyConfig)
                                                 )
                                 )
